@@ -1,0 +1,54 @@
+Name: Alex Morgan
+Email: alex.morgan@example.com
+Location: San Francisco, CA
+
+Summary
+Software engineer with 6 years of experience building backend services and APIs for web applications. Strong background in Java and Python, with experience deploying services to cloud environments. Interested in transitioning into AI engineering and applied machine learning roles.
+
+Skills
+- Programming Languages: Java, Python, SQL
+- Frameworks: Spring Boot, FastAPI
+- Databases: PostgreSQL, MySQL
+- Cloud Platforms: AWS (EC2, S3, RDS, Lambda)
+- Tools: Docker, Git, GitHub Actions
+- Concepts: REST APIs, Microservices, CI/CD, Distributed Systems
+
+Professional Experience
+
+Senior Software Engineer
+Acme Software Inc. | Jan 2021 – Present
+- Designed and implemented REST APIs using Spring Boot to support core product features.
+- Led migration of legacy services to a microservices architecture.
+- Improved API response times by 35% through query optimization and caching.
+- Collaborated with product managers and frontend engineers to define requirements and deliver features.
+
+Software Engineer
+BrightTech Solutions | Jun 2018 – Dec 2020
+- Developed backend services in Java and Python for internal tools.
+- Built data ingestion pipelines to process and validate customer data.
+- Wrote unit and integration tests to improve system reliability.
+- Participated in on-call rotation and incident response.
+
+Projects
+
+Document Question Answering Chatbot
+- Built a chatbot that answers questions over a set of documents using embeddings and a large language model.
+- Implemented document chunking, vector search, and retrieval-augmented generation.
+- Exposed functionality through a REST API using FastAPI.
+
+Task Management API
+- Designed and implemented a task management backend with role-based access control.
+- Used PostgreSQL for persistence and Docker for local development.
+- Deployed the service to AWS using EC2 and RDS.
+
+Education
+Bachelor of Science in Computer Science
+University of California, Davis
+
+Certifications
+- AWS Certified Cloud Practitioner
+
+Interests
+- Applied artificial intelligence
+- System design
+- Developer productivity tools
