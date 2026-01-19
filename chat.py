@@ -17,7 +17,10 @@ def format_context(docs) -> str:
 
 
 def main():
+    # load embeddings
     embeddings = OpenAIEmbeddings()
+
+    # load FAISS from disk
     vector_store = FAISS.load_local(
         "index",
         embeddings,
@@ -28,13 +31,17 @@ def main():
     llm = ChatOpenAI(model="gpt-5-nano", temperature=0)
 
     while True:
+        # Wait for user input
         question = input("\nAsk a question (or 'exit'): ").strip()
         if question.lower() == "exit":
             break
         if not question:
             continue
 
+        # Get relevant documents
         docs = retriever.invoke(question)
+
+        # Build prompt with context
         context = format_context(docs)
 
         messages = [
@@ -48,7 +55,10 @@ def main():
             },
         ]
 
+        # Call LLM
         resp = llm.invoke(messages)
+
+        # Print answer
         print("\nAnswer:", resp.content)
 
 
