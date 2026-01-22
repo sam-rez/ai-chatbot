@@ -1,33 +1,52 @@
-# AI Chatbot with Retrieval-Augmented Generation (RAG)
+# AI Chatbot with Retrieval‑Augmented Generation (RAG)
 
 ## Overview
 
-This project is a **Retrieval-Augmented Generation (RAG) chatbot**.
-It answers questions by **retrieving relevant information from pre-indexed documents** and using a large language model (LLM) to generate answers **strictly from that retrieved context**.
+This project is a **Retrieval‑Augmented Generation (RAG) chatbot** built to demonstrate **production‑style AI system design**, not just prompt usage.
 
-The goal of this project is to demonstrate how modern AI applications separate:
+It answers questions by **retrieving relevant information from pre‑indexed documents** and using a large language model (LLM) to generate answers **strictly from that retrieved context**.
+
+The goal is to show how modern AI applications cleanly separate:
 
 * **Knowledge storage & retrieval**
 * **Language understanding & generation**
+* **Application interfaces (API / CLI)**
 
 rather than relying on the LLM’s internal training data alone.
 
 ---
 
-## Architecture
+## High‑Level Architecture
 
-The application is split into two phases:
+The system is intentionally split into **offline** and **online** components.
+
+```
+┌────────────┐      ┌──────────────┐      ┌──────────────┐
+│  Documents │──▶──▶│ Vector Index │──▶──▶│   RAG Engine │──▶ Answer
+└────────────┘      └──────────────┘      └──────────────┘
+                                           ▲          ▲
+                                           │          │
+                                       CLI (chat.py)  │
+                                                      │
+                                               API (app.py)
+```
+
+This separation mirrors real production AI services.
+
+---
+
+## Components
 
 ### 1. Ingestion (Offline)
 
-Handled by `ingest.py`.
+Handled by **`ingest.py`**.
 
 **What it does:**
 
-* Loads raw text documents
+* Loads raw text documents from `docs/`
 * Splits them into manageable chunks
 * Converts each chunk into a vector embedding
-* Stores embeddings in a FAISS index on disk
+* Persists the embeddings to a vector index on disk
 
 **Why this is offline:**
 
@@ -39,29 +58,67 @@ Handled by `ingest.py`.
 
 ```
 index/
-├── index.faiss   # Vector index for fast similarity search
-└── index.pkl     # Mapping from vectors to original text + metadata
+├── index.faiss / data files
+└── metadata mappings
 ```
+
+> This index functions as the chatbot’s **external knowledge base**.
 
 ---
 
-### 2. Querying (Runtime)
+### 2. RAG Engine (Core Logic)
 
-Handled by `chat.py`.
+Handled by **`rag.py`**.
 
-**What it does:**
+This file contains **all AI‑specific logic**, including:
 
-1. Accepts a user question
-2. Converts the question into an embedding
-3. Retrieves the most relevant document chunks from the FAISS index
-4. Sends the retrieved chunks + the question to the LLM
-5. Returns an answer constrained to the retrieved context
+* Loading embeddings and the vector store
+* Retrieving relevant chunks for a query
+* Formatting retrieval context
+* Calling the LLM
+* Returning structured results (answer + citations)
 
-This separation ensures the model:
+**Key rule:**
 
-* Uses **external, updatable knowledge**
-* Does **not hallucinate** answers
-* Can explain *where* information came from
+> `rag.py` has **no awareness of HTTP or the CLI**.
+
+This makes it reusable, testable, and easy to extend with guardrails, evaluation, or observability later.
+
+---
+
+### 3. Querying Interfaces (Runtime)
+
+#### A. HTTP API — `app.py`
+
+A **FastAPI** application that exposes the chatbot as a service.
+
+**Endpoints:**
+
+* `POST /chat` — main business endpoint
+
+  * Accepts a question
+  * Calls the RAG engine
+  * Returns a grounded answer with citations
+
+* `GET /health` — monitoring endpoint
+
+  * Confirms the service started successfully
+  * Safe for uptime checks and orchestration systems
+
+The API layer is intentionally thin and delegates all logic to `rag.py`.
+
+---
+
+#### B. CLI — `chat.py`
+
+A simple command‑line interface for local development and testing.
+
+**Purpose:**
+
+* Fast iteration without HTTP overhead
+* Manual inspection of answers and retrieval behavior
+
+Both the API and CLI call **the same RAG engine**, ensuring a single source of truth.
 
 ---
 
@@ -71,21 +128,23 @@ This project qualifies as a RAG system because:
 
 * Knowledge lives **outside the model**
 * Relevant context is **retrieved before generation**
-* The LLM does not rely on its training data alone
-* Updating knowledge requires **re-ingesting documents**, not retraining a model
+* The LLM is constrained to the retrieved content
+* Updating knowledge requires **re‑ingesting documents**, not retraining
 
 In short:
 
-> **Retrieval happens first, generation happens second.**
+> **Retrieval happens first. Generation happens second.**
 
 ---
 
 ## Key Design Decisions
 
-* **Vector search (FAISS)** is used for semantic retrieval instead of keyword search
+* **Vector search** is used for semantic retrieval instead of keyword search
 * **Embeddings are precomputed** to reduce latency and cost
-* **Temperature is set to 0** to encourage deterministic, factual answers
-* The LLM is explicitly instructed to say *“I don’t know”* when information is missing
+* **Temperature = 0** to encourage deterministic, factual responses
+* The model is instructed to explicitly say *“I don’t know”* when information is missing
+* Core logic is isolated from interfaces (API / CLI)
+* A health endpoint is provided for operational monitoring
 
 ---
 
@@ -94,30 +153,31 @@ In short:
 * How embeddings represent meaning numerically
 * How similarity search enables semantic retrieval
 * How LLMs act as reasoning layers over retrieved data
-* Why RAG is preferred over fine-tuning for most applications
+* How to structure an AI service like a backend system
+* Why RAG is preferred over fine‑tuning for most applications
 * How to debug RAG systems by inspecting retrieved chunks
 
 ---
 
-## Limitations
+## Current Limitations (Intentional)
 
-* No conversation memory (each question is stateless)
-* No web UI (CLI only)
-* No caching of responses or embeddings
-* Assumes documents are in English
+* No conversation memory (each request is stateless)
+* No frontend UI
+* No retrieval confidence scoring yet
+* No caching or evaluation harness
 
-These are intentional to keep the core architecture clear.
+These are intentionally omitted to keep the core architecture clear.
 
 ---
 
 ## Possible Improvements
 
-* Add citations directly into answers
-* Wrap the chatbot in a FastAPI service
-* Add a simple frontend
-* Implement query rewriting to improve retrieval
-* Add caching for repeated questions
-* Swap FAISS or the LLM provider to demonstrate modularity
+* Add retrieval thresholds and confidence scores
+* Skip LLM calls when retrieval is weak
+* Add structured observability (latency, request IDs)
+* Add automated evaluation with golden Q&A sets
+* Introduce streaming responses
+* Swap vector stores or LLM providers to demonstrate modularity
 
 ---
 
@@ -125,78 +185,62 @@ These are intentional to keep the core architecture clear.
 
 ### Prerequisites
 
-* Python **3.10+**
+* Python **3.11+**
 * An OpenAI API key
-* [`uv`](https://github.com/astral-sh/uv) installed
-
----
-
-### Create the virtual environment
-
-From the project root:
-
-```bash
-uv venv
-```
-
-This creates a local virtual environment in `.venv/`.
+* [`uv`](https://github.com/astral-sh/uv)
 
 ---
 
 ### Install dependencies
 
 ```bash
-uv pip install \
-  langchain \
-  langchain-community \
-  langchain-openai \
-  langchain-text-splitters \
-  faiss-cpu
+uv sync
 ```
+
+This installs all dependencies defined in `pyproject.toml` using the locked versions in `uv.lock`.
 
 ---
 
 ### Set the OpenAI API key
 
-#### Bash (Git Bash / WSL)
+#### Git Bash / WSL
 
 ```bash
-export OPENAI_API_KEY="sk-REPLACE_ME"
+export OPENAI_API_KEY="sk‑REPLACE_ME"
 ```
-
-(Optional: add this to `~/.bashrc` to persist it.)
 
 #### PowerShell
 
 ```powershell
-$env:OPENAI_API_KEY="sk-REPLACE_ME"
+$env:OPENAI_API_KEY="sk‑REPLACE_ME"
 ```
+
+---
 
 ## Running the Project
 
-### Ingest documents
+### Build the vector index
 
 ```bash
 uv run python ingest.py
 ```
 
-This builds the FAISS index used for retrieval.
+---
+
+### Start the API server
+
+```bash
+uv run uvicorn app:app --reload
+```
+
+* API: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+* Docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+* Health check: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
 
 ---
 
-### Start the chatbot
+### Run the CLI
 
 ```bash
 uv run python chat.py
 ```
-
----
-
-## Takeaway
-
-This project illustrates a core principle of AI engineering:
-
-> **LLMs are not databases.
-> They are reasoning engines layered on top of retrieved knowledge.**
-
-Understanding and implementing this separation is foundational for building reliable, production-grade AI systems.
