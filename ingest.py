@@ -4,7 +4,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 
 def main():
-    loader = TextLoader("docs/resume.txt")
+    loader = TextLoader("docs/resume.txt", encoding="utf-8")
     docs = loader.load()
 
     splitter = RecursiveCharacterTextSplitter(
