@@ -1,4 +1,3 @@
-# chat.py
 from rag import RAGEngine
 
 def main():
