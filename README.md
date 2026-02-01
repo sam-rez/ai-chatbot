@@ -35,6 +35,72 @@ This separation mirrors real production AI services.
 
 ---
 
+## Setup
+
+### Prerequisites
+
+* Python **3.11+**
+* An OpenAI API key
+* [`uv`](https://github.com/astral-sh/uv)
+
+---
+
+### Install dependencies
+
+```bash
+uv sync
+```
+
+This installs all dependencies defined in `pyproject.toml` using the locked versions in `uv.lock`.
+
+---
+
+### Set the OpenAI API key
+
+#### Git Bash / WSL
+
+```bash
+export OPENAI_API_KEY="sk‑REPLACE_ME"
+```
+
+#### PowerShell
+
+```powershell
+$env:OPENAI_API_KEY="sk‑REPLACE_ME"
+```
+
+---
+
+## Running the Project
+
+### Build the vector index
+
+```bash
+uv run python ingest.py
+```
+
+---
+
+### Start the API server
+
+```bash
+uv run uvicorn app:app --reload
+```
+
+* API: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+* Docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+* Health check: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
+
+---
+
+### Run the CLI
+
+```bash
+uv run python chat.py
+```
+
+---
+
 ## Components
 
 ### 1. Ingestion (Offline)
@@ -156,91 +222,3 @@ In short:
 * How to structure an AI service like a backend system
 * Why RAG is preferred over fine‑tuning for most applications
 * How to debug RAG systems by inspecting retrieved chunks
-
----
-
-## Current Limitations (Intentional)
-
-* No conversation memory (each request is stateless)
-* No frontend UI
-* No retrieval confidence scoring yet
-* No caching or evaluation harness
-
-These are intentionally omitted to keep the core architecture clear.
-
----
-
-## Possible Improvements
-
-* Add retrieval thresholds and confidence scores
-* Skip LLM calls when retrieval is weak
-* Add structured observability (latency, request IDs)
-* Add automated evaluation with golden Q&A sets
-* Introduce streaming responses
-* Swap vector stores or LLM providers to demonstrate modularity
-
----
-
-## Setup
-
-### Prerequisites
-
-* Python **3.11+**
-* An OpenAI API key
-* [`uv`](https://github.com/astral-sh/uv)
-
----
-
-### Install dependencies
-
-```bash
-uv sync
-```
-
-This installs all dependencies defined in `pyproject.toml` using the locked versions in `uv.lock`.
-
----
-
-### Set the OpenAI API key
-
-#### Git Bash / WSL
-
-```bash
-export OPENAI_API_KEY="sk‑REPLACE_ME"
-```
-
-#### PowerShell
-
-```powershell
-$env:OPENAI_API_KEY="sk‑REPLACE_ME"
-```
-
----
-
-## Running the Project
-
-### Build the vector index
-
-```bash
-uv run python ingest.py
-```
-
----
-
-### Start the API server
-
-```bash
-uv run uvicorn app:app --reload
-```
-
-* API: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-* Docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-* Health check: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
-
----
-
-### Run the CLI
-
-```bash
-uv run python chat.py
-```
