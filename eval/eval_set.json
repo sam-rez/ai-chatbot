@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What is Alex Morgan's email address?",
+    "expected_answer": "alex.morgan@example.com",
+    "source": "docs/resume.txt"
+  },
+  {
+    "question": "Where is Alex Morgan located?",
+    "expected_answer": "San Francisco, CA",
+    "source": "docs/resume.txt"
+  },
+  {
+    "question": "How many years of experience does Alex have?",
+    "expected_answer": "6 years",
+    "source": "docs/resume.txt"
+  },
+  {
+    "question": "What programming languages does Alex know?",
+    "expected_answer": "Java, Python, SQL",
+    "source": "docs/resume.txt"
+  },
+  {
+    "question": "Where does Alex work currently?",
+    "expected_answer": "Acme Software Inc.",
+    "source": "docs/resume.txt"
+  },
+  {
+    "question": "What did Alex build at BrightTech Solutions?",
+    "expected_answer": "backend services, data ingestion pipelines",
+    "source": "docs/resume.txt"
+  },
+  {
+    "question": "What frameworks does Alex use?",
+    "expected_answer": "Spring Boot, FastAPI",
+    "source": "docs/resume.txt"
+  },
+  {
+    "question": "What is Alex's educational background?",
+    "expected_answer": "Bachelor of Science in Computer Science from University of California, Davis",
+    "source": "docs/resume.txt"
+  },
+  {
+    "question": "What AWS certification does Alex have?",
+    "expected_answer": "AWS Certified Cloud Practitioner",
+    "source": "docs/resume.txt"
+  },
+  {
+    "question": "What did the document question answering chatbot project involve?",
+    "expected_answer": "embeddings, vector search, retrieval-augmented generation, FastAPI",
+    "source": "docs/resume.txt"
+  },
+  {
+    "question": "By how much did Alex improve API response times at Acme?",
+    "expected_answer": "35%",
+    "source": "docs/resume.txt"
+  },
+  {
+    "question": "What cloud platforms has Alex used?",
+    "expected_answer": "AWS",
+    "source": "docs/resume.txt"
+  }
+]

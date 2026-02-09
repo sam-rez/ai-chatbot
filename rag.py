@@ -22,7 +22,7 @@ class RAGEngine:
     TOP_K = 4
     # For FAISS with L2 distance (common default): lower = more similar.
     # If best_score is ABOVE this threshold, retrieval is probably too weak to answer.
-    RETRIEVAL_SCORE_THRESHOLD = 0.35
+    RETRIEVAL_SCORE_THRESHOLD = 0.5
 
     def __init__(self, index_path: str = "index"):
         self.embeddings = OpenAIEmbeddings()
@@ -46,7 +46,7 @@ class RAGEngine:
         conf = 1.0 - (best_score / t)
         return max(0.0, min(1.0, conf))
 
-    def answer(self, question: str) -> Dict[str, Any]:
+    def answer(self, question: str, *, return_context: bool = False) -> Dict[str, Any]:
         question = (question or "").strip()
         if not question:
             return {
@@ -102,10 +102,13 @@ class RAGEngine:
             for i, d in enumerate(docs)
         ]
 
-        return {
+        result: Dict[str, Any] = {
             "answer": resp.content,
             "citations": citations,
             "confidence": confidence,
             "used_llm": True,
             "retrieval_score": best_score,
         }
+        if return_context:
+            result["context"] = context
+        return result
